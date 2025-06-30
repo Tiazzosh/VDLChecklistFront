@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Videalert App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      max-width: 600px;
+      margin: 40px auto;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    input[type="text"], input[type="password"], input[type="file"],
+    textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .button-group button {
+      margin-right: 10px;
+    }
+    .urn-group {
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .urn-group button.remove, .sub-entry button.remove-sub-entry {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 3px;
+      cursor: pointer;
+      margin-top: 0;
+    }
+    .urn-group button.remove:hover, .sub-entry button.remove-sub-entry:hover {
+        background-color: #c82333;
+    }
+    .checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #ccc;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+      transition: background 0.3s, border 0.3s;
+    }
+    .checkbox.checked {
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+    .checkbox.checked::after {
+      content: '\2713';
+      color: white;
+      font-size: 14px;
+    }
+    .item-text.checked {
+      text-decoration: line-through;
+      color: #6c757d;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .sub-entry {
+      border: 1px solid #eee;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 4px;
+      background-color: #f1f1f1;
+      position: relative;
+    }
+    .image-preview-wrapper {
+      margin-top: 10px;
+      padding: 10px;
+      border: 2px dashed #ff0000;
+      border-radius: 4px;
+      background-color: #e0e0e0;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .image-preview {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .add-sub-entry-btn {
+        margin-top: 10px;
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: white;
+        font-size: 14px;
+        border: none;
+        border-radius: 5px;
+    }
+    .add-sub-entry-btn:hover {
+        background-color: #0056b3;
+    }
+    .image-preview-wrapper .remove-image-button {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 3px;
+      cursor: pointer;
+      margin-top: 0;
+    }
+    .image-preview-wrapper .remove-image-button:hover {
+      background-color: #c82333;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" id="login-card">
+    <h1>Login or Register</h1>
+    <label>Username</label>
+    <input type="text" id="username">
+    <label>Password</label>
+    <input type="password" id="password">
+    <div class="button-group">
+      <button onclick="login()">Login</button>
+      <button onclick="register()" style="background-color: #28a745;">Register</button>
+    </div>
+  </div>
+
+  <div class="card hidden" id="landing-card">
+    <h1>Welcome, <span id="logged-in-user"></span></h1>
+    <p><strong>What do you want to do?</strong></p>
+    <button onclick="goToChecklist()">Create a checklist for a new site</button>
+    <button onclick="alert('Relocation checklist coming soon!')">Create a checklist for a relocation</button>
+    <hr>
+    <button onclick="logout()" style="background-color: #6c757d;">Logout</button>
+  </div>
+
+  <div class="card hidden" id="checklist-card">
+    <h1>Videalert Post-Install Checklist</h1>
+    <p>Logged in as: <strong id="checklist-username"></strong></p>
+    <label for="client-name">Client Name *</label>
+    <input type="text" id="client-name" required>
+    <label for="project-id">Project ID</label>
+    <input type="text" id="project-id">
+    <label>URN(s) + Trigger Type</label>
+    <div class="urn-list" id="urn-list">
+      <div class="urn-group">
+        <button type="button" class="remove" onclick="this.parentElement.remove()">Remove</button>
+        <label>URN</label>
+        <input type="text" name="urn[]">
+        <label>Trigger Type Configured</label>
+        <input type="text" name="trigger[]">
+        <div class="cv-cuv-live-areas"></div>
+        <button type="button" class="add-sub-entry-btn" onclick="addCvCuvLiveArea(this, 'CV')">Add CV</button>
+        <button type="button" class="add-sub-entry-btn" onclick="addCvCuvLiveArea(this, 'CUV')">Add CUV</button>
+        <button type="button" class="add-sub-entry-btn" onclick="addCvCuvLiveArea(this, 'Live Area')">Add Live Area</button>
+      </div>
+    </div>
+    <button type="button" onclick="addUrnPair()">Add another URN + Trigger Type</button>
+    <ul id="checklist">
+      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Turn off EWF</span></li>
+      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Check Software Version - Does it match the VCMS?</span></li>
+      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Camera Images suitable for enforcing the contravention</span></li>
+      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Privacy masks added on CV camera(s)</span></li>
+      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Location Codes configured and checked with PM/SDM</span></li>
+      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">KEK Keys in date and checked</span></li>
+      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Store Folder check - no test VRECs from workshop</span></li>
+      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">SSD configuration checked and suitable for enforcement</span></li>
+      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Test Alerts generated</span></li>
+      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Test Alerts are transferring to VCMS</span></li>
+      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Camera Schedule correctly configured</span></li>
+      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Exemptions correctly added</span></li>
+      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Alert Exclude added correctly</span></li>
+      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Alerts are displaying correctly on EMC</span></li>
+      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">DVLA lookup correctly done on EMC</span></li>
+      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Alerts moved on Hold folder for client UAT</span></li>
+    </ul>
+    <label for="notes-section">Notes</label>
+    <textarea id="notes-section" rows="6" placeholder="Add any additional notes here..."></textarea>
+    <button onclick="exportPDF()">Export as PDF</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    // =================================================================
+    //                    Configuration & State
+    // =================================================================
+    const backendUrl = "https://vdlchecklist.onrender.com/";
+    let currentUser = "";
+
+    // =================================================================
+    //                  User Management Functions
+    // =================================================================
+
+    async function register() {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+      if (!username || !password) {
+        alert("Please enter a username and password.");
+        return;
+      }
+      try {
+        const response = await fetch(`${backendUrl}/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+        const result = await response.json();
+        alert(result.message);
+      } catch (error) {
+        alert("Registration failed. Could not connect to the server.");
+      }
+    }
+
+    async function login() {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+      try {
+        const response = await fetch(`${backendUrl}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+        const result = await response.json();
+        if (result.token) {
+          localStorage.setItem('authToken', result.token); // Store the token
+          currentUser = username;
+          document.getElementById("login-card").classList.add("hidden");
+          document.getElementById("landing-card").classList.remove("hidden");
+          document.getElementById("logged-in-user").innerText = username;
+        } else {
+          alert(result.message);
+        }
+      } catch (error) {
+        alert("Login failed. Could not connect to the server.");
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('authToken'); // Clear the token
+      currentUser = "";
+      document.getElementById("landing-card").classList.add("hidden");
+      document.getElementById("checklist-card").classList.add("hidden");
+      document.getElementById("login-card").classList.remove("hidden");
+    }
+
+    // =================================================================
+    //                    App Navigation & Logic
+    // =================================================================
+
+    function goToChecklist() {
+      document.getElementById("landing-card").classList.add("hidden");
+      document.getElementById("checklist-card").classList.remove("hidden");
+      document.getElementById("checklist-username").innerText = currentUser;
+    }
+
+    function addUrnPair() {
+      const urnList = document.getElementById("urn-list");
+      const group = document.createElement("div");
+      group.className = "urn-group";
+      group.innerHTML = `
+        <button type="button" class="remove" onclick="this.parentElement.remove()">Remove</button>
+        <label>URN</label>
+        <input type="text" name="urn[]">
+        <label>Trigger Type Configured</label>
+        <input type="text" name="trigger[]">
+        <div class="cv-cuv-live-areas"></div>
+        <button type="button" class="add-sub-entry-btn" onclick="addCvCuvLiveArea(this, 'CV')">Add CV</button>
+        <button type="button" class="add-sub-entry-btn" onclick="addCvCuvLiveArea(this, 'CUV')">Add CUV</button>
+        <button type="button" class="add-sub-entry-btn" onclick="addCvCuvLiveArea(this, 'Live Area')">Add Live Area</button>
+      `;
+      urnList.appendChild(group);
+    }
+
+    function addCvCuvLiveArea(buttonElement, type) {
+        const urnGroup = buttonElement.closest('.urn-group');
+        const subEntryContainer = urnGroup.querySelector('.cv-cuv-live-areas');
+        const currentCount = subEntryContainer.querySelectorAll(`[data-type="${type}"]`).length;
+        const newIndex = currentCount + 1;
+        const uniqueId = `${type.toLowerCase().replace(' ', '-')}-${Date.now()}`;
+        const subEntry = document.createElement("div");
+        subEntry.className = "sub-entry";
+        subEntry.setAttribute("data-type", type);
+        let additionalFields = '';
+        if (type === 'CUV') {
+            additionalFields = `
+                <label>Location Code</label>
+                <input type="text" name="cuv_location_code[]">
+                <label>Engine ID</label>
+                <input type="text" name="cuv_engine_id[]">
+                <label>Camera ID</label>
+                <input type="text" name="cuv_camera_id[]">
+            `;
+        } else if (type === 'CV') {
+            additionalFields = `
+                <label>Camera ID</label>
+                <input type="text" name="cv_camera_id[]">
+            `;
+        }
+        subEntry.innerHTML = `
+            <button type="button" class="remove-sub-entry" onclick="this.parentElement.remove()">Remove</button>
+            <label>${type}${newIndex}</label>
+            ${additionalFields}
+            <input type="file" accept="image/*" onchange="previewImage(event, '${uniqueId}')">
+            <div id="image-preview-wrapper-${uniqueId}" class="image-preview-wrapper hidden">
+                <img id="preview-${uniqueId}" class="image-preview">
+                <button type="button" onclick="removeImageSection('${uniqueId}')" class="remove-image-button">Remove Image</button>
+            </div>
+        `;
+        subEntryContainer.appendChild(subEntry);
+    }
+
+    function previewImage(event, id) {
+        const reader = new FileReader();
+        reader.onload = function(){
+            const output = document.getElementById(`preview-${id}`);
+            const wrapper = document.getElementById(`image-preview-wrapper-${id}`);
+            if (output && wrapper) {
+                output.src = reader.result;
+                wrapper.classList.remove('hidden');
+            }
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+
+    function removeImageSection(id) {
+        const wrapper = document.getElementById(`image-preview-wrapper-${id}`);
+        const fileInput = wrapper ? wrapper.previousElementSibling : null;
+        if (wrapper) {
+            wrapper.classList.add('hidden');
+            const output = wrapper.querySelector(`#preview-${id}`);
+            if(output) output.src = "";
+        }
+        if (fileInput && fileInput.type === 'file') fileInput.value = '';
+    }
+
+    function toggleCheck(item) {
+      const checkbox = item.querySelector('.checkbox');
+      const text = item.querySelector('.item-text');
+      checkbox.classList.toggle('checked');
+      text.classList.toggle('checked');
+    }
+
+    async function exportPDF() {
+      const { jsPDF } = window.jspdf;
+      const element = document.getElementById("checklist-card");
+      const canvas = await html2canvas(element, { scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgProps = pdf.getImageProperties(imgData);
+      const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+      heightLeft -= pdfHeight;
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+        heightLeft -= pdfHeight;
+      }
+      pdf.save(`${currentUser}_checklist.pdf`);
+    }
+  </script>
+</body>
+</html>
