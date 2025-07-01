@@ -14,49 +14,49 @@
     <input type="text" id="username">
     <label for="password">Password</label>
     <input type="password" id="password">
-    <button onclick="login()">Login</button>
-    <a href="#" onclick="goToForgotPassword(event)" style="display: block; text-align: center; margin-top: 15px;">Forgot my password?</a>
+    <button id="login-btn">Login</button>
+    <a href="#" id="forgot-password-link" style="display: block; text-align: center; margin-top: 15px;">Forgot my password?</a>
   </div>
 
   <div class="card auth-card hidden" id="forgot-password-card">
     <h1>Forgot Password</h1>
-    <p>Enter your email, and we'll send you a link to reset your password.</p>
+    <p>Enter your email, and we'll send a link to reset your password.</p>
     <label for="forgot-email">Email</label>
     <input type="email" id="forgot-email" required>
-    <button onclick="requestPasswordReset()">Send Reset Link</button>
-    <a href="#" onclick="goToLogin(event)" style="display: block; text-align: center; margin-top: 15px;">Back to Login</a>
+    <button id="send-reset-link-btn">Send Reset Link</button>
+    <a href="#" id="back-to-login-link" style="display: block; text-align: center; margin-top: 15px;">Back to Login</a>
   </div>
 
   <div class="card auth-card hidden" id="reset-password-card">
     <h1>Reset Your Password</h1>
     <label for="reset-new-password">New Password</label>
     <input type="password" id="reset-new-password" required>
-    <button onclick="performPasswordReset()">Reset Password</button>
+    <button id="reset-password-btn">Reset Password</button>
   </div>
 
   <div class="card hidden" id="landing-card">
     <h1>Welcome, <span id="logged-in-user"></span></h1>
     <p><strong>What do you want to do?</strong></p>
-    <button onclick="goToChecklist()">Create a checklist</button>
-    <button id="user-management-btn" class="hidden" onclick="goToUserManagement()">User Management</button>
-    <button onclick="goToProfile()">My Profile</button>
+    <button id="go-to-checklist-btn">Create a checklist</button>
+    <button id="user-management-btn" class="hidden">User Management</button>
+    <button id="go-to-profile-btn">My Profile</button>
     <hr>
-    <button onclick="logout()" style="background-color: #6c757d;">Logout</button>
+    <button id="logout-btn" style="background-color: #6c757d;">Logout</button>
   </div>
   
   <div class="card auth-card hidden" id="profile-card">
-      <button onclick="goBackToLanding()">← Back to Main Menu</button>
-      <h1>My Profile</h1>
-      <h2>Change Password</h2>
-      <label for="current-password">Current Password</label>
-      <input type="password" id="current-password" required>
-      <label for="new-password">New Password</label>
-      <input type="password" id="new-password" required>
-      <button onclick="changePassword()">Update Password</button>
+    <button class="back-to-landing-btn">← Back to Main Menu</button>
+    <h1>My Profile</h1>
+    <h2>Change Password</h2>
+    <label for="current-password">Current Password</label>
+    <input type="password" id="current-password" required>
+    <label for="new-password">New Password</label>
+    <input type="password" id="new-password" required>
+    <button id="change-password-btn">Update Password</button>
   </div>
 
   <div class="card hidden user-management-card" id="user-management-card">
-    <button onclick="goBackToLanding()">← Back to Main Menu</button>
+    <button class="back-to-landing-btn">← Back to Main Menu</button>
     <h1>User Management</h1>
     <h2>All Users</h2>
     <div style="overflow-x:auto;">
@@ -75,7 +75,7 @@
       </table>
     </div>
     <h2>Create New User</h2>
-    <form id="register-form" onsubmit="event.preventDefault(); createNewUser();">
+    <form id="register-form">
       <label for="reg-username">Username</label>
       <input type="text" id="reg-username" required>
       <label for="reg-password">Password</label>
@@ -98,7 +98,7 @@
   </div>
 
   <div class="card hidden checklist-card" id="checklist-card">
-    <button onclick="goBackToLanding()">← Back to Main Menu</button>
+    <button class="back-to-landing-btn">← Back to Main Menu</button>
     <h1>Videalert Post-Install Checklist</h1>
     <p>Logged in as: <strong id="checklist-username"></strong></p>
     <label for="client-name">Client Name *</label>
@@ -107,35 +107,35 @@
     <input type="text" id="project-id">
     <label>URN(s) + Trigger Type</label>
     <div class="urn-list" id="urn-list"></div>
-    <button type="button" onclick="addUrnPair()">Add URN + Trigger Type</button>
+    <button type="button" id="add-urn-btn">Add URN + Trigger Type</button>
     <hr style="margin-top: 30px;">
     <h2>Standard Checks</h2>
     <ul id="checklist">
-      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Turn off EWF</span></li>
-      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Check Software Version - Does it match the VCMS?</span></li>
-      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Camera Images suitable for enforcing the contravention</span></li>
-      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Privacy masks added on CV camera(s)</span></li>
-      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Location Codes configured and checked with PM/SDM</span></li>
-      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">KEK Keys in date and checked</span></li>
-      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Store Folder check - no test VRECs from workshop</span></li>
-      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">SSD configuration checked and suitable for enforcement</span></li>
-      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Test Alerts generated</span></li>
-      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Test Alerts are transferring to VCMS</span></li>
-      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Camera Schedule correctly configured</span></li>
-      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Exemptions correctly added</span></li>
-      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Alert Exclude added correctly</span></li>
-      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Alerts are displaying correctly on EMC</span></li>
-      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">DVLA lookup correctly done on EMC</span></li>
-      <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Alerts moved on Hold folder for client UAT</span></li>
+      <li><span class="checkbox"></span><span class="item-text">Turn off EWF</span></li>
+      <li><span class="checkbox"></span><span class="item-text">Check Software Version - Does it match the VCMS?</span></li>
+      <li><span class="checkbox"></span><span class="item-text">Camera Images suitable for enforcing the contravention</span></li>
+      <li><span class="checkbox"></span><span class="item-text">Privacy masks added on CV camera(s)</span></li>
+      <li><span class="checkbox"></span><span class="item-text">Location Codes configured and checked with PM/SDM</span></li>
+      <li><span class="checkbox"></span><span class="item-text">KEK Keys in date and checked</span></li>
+      <li><span class="checkbox"></span><span class="item-text">Store Folder check - no test VRECs from workshop</span></li>
+      <li><span class="checkbox"></span><span class="item-text">SSD configuration checked and suitable for enforcement</span></li>
+      <li><span class="checkbox"></span><span class="item-text">Test Alerts generated</span></li>
+      <li><span class="checkbox"></span><span class="item-text">Test Alerts are transferring to VCMS</span></li>
+      <li><span class="checkbox"></span><span class="item-text">Camera Schedule correctly configured</span></li>
+      <li><span class="checkbox"></span><span class="item-text">Exemptions correctly added</span></li>
+      <li><span class="checkbox"></span><span class="item-text">Alert Exclude added correctly</span></li>
+      <li><span class="checkbox"></span><span class="item-text">Alerts are displaying correctly on EMC</span></li>
+      <li><span class="checkbox"></span><span class="item-text">DVLA lookup correctly done on EMC</span></li>
+      <li><span class="checkbox"></span><span class="item-text">Alerts moved on Hold folder for client UAT</span></li>
     </ul>
     <label for="notes-section">Notes</label>
     <textarea id="notes-section" rows="6" placeholder="Add any additional notes here..."></textarea>
-    <button onclick="exportPDF()">Export as PDF</button>
+    <button id="export-pdf-btn">Export as PDF</button>
   </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="scripts.js"> </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="script.js"></script>
 
 </body>
 </html>
