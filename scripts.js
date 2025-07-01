@@ -207,7 +207,7 @@ async function createNewUser() {
     }
     const token = localStorage.getItem('authToken');
     try {
-        const response = await fetch(`${backendUrl}/register`, {
+        const response = await fetch(`${backendUrl}/api/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
