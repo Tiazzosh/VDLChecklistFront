@@ -6,8 +6,9 @@
   <title>Videalert App</title>
   <style>
     body { font-family: Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; }
-    .card { background: #fff; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 30px; max-width: 800px; margin: 40px auto; }
-    .checklist-card { max-width: 600px; }
+    .card { background: #fff; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 30px; margin: 40px auto; }
+    .auth-card { max-width: 400px; }
+    .checklist-card, .user-management-card { max-width: 800px; }
     h1 { font-size: 24px; margin-bottom: 20px; }
     h2 { font-size: 20px; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
     label { display: block; margin-top: 20px; font-weight: bold; }
@@ -38,25 +39,54 @@
 </head>
 <body>
 
-  <div class="card" id="login-card">
+  <div class="card auth-card" id="login-card">
     <h1>Login</h1>
     <label for="username">Username</label>
     <input type="text" id="username">
     <label for="password">Password</label>
     <input type="password" id="password">
     <button onclick="login()">Login</button>
+    <a href="#" onclick="goToForgotPassword(event)" style="display: block; text-align: center; margin-top: 15px;">Forgot my password?</a>
+  </div>
+
+  <div class="card auth-card hidden" id="forgot-password-card">
+    <h1>Forgot Password</h1>
+    <p>Enter your email, and we'll send you a link to reset your password.</p>
+    <label for="forgot-email">Email</label>
+    <input type="email" id="forgot-email" required>
+    <button onclick="requestPasswordReset()">Send Reset Link</button>
+    <a href="#" onclick="goToLogin(event)" style="display: block; text-align: center; margin-top: 15px;">Back to Login</a>
+  </div>
+
+  <div class="card auth-card hidden" id="reset-password-card">
+    <h1>Reset Your Password</h1>
+    <label for="reset-new-password">New Password</label>
+    <input type="password" id="reset-new-password" required>
+    <button onclick="performPasswordReset()">Reset Password</button>
   </div>
 
   <div class="card hidden" id="landing-card">
     <h1>Welcome, <span id="logged-in-user"></span></h1>
     <p><strong>What do you want to do?</strong></p>
-    <button onclick="goToChecklist()">Create a checklist for a new site</button>
+    <button onclick="goToChecklist()">Create a checklist</button>
     <button id="user-management-btn" class="hidden" onclick="goToUserManagement()">User Management</button>
+    <button onclick="goToProfile()">My Profile</button>
     <hr>
     <button onclick="logout()" style="background-color: #6c757d;">Logout</button>
   </div>
   
-  <div class="card hidden" id="user-management-card">
+  <div class="card auth-card hidden" id="profile-card">
+      <button onclick="goBackToLanding()">← Back to Main Menu</button>
+      <h1>My Profile</h1>
+      <h2>Change Password</h2>
+      <label for="current-password">Current Password</label>
+      <input type="password" id="current-password" required>
+      <label for="new-password">New Password</label>
+      <input type="password" id="new-password" required>
+      <button onclick="changePassword()">Update Password</button>
+  </div>
+
+  <div class="card hidden user-management-card" id="user-management-card">
     <button onclick="goBackToLanding()">← Back to Main Menu</button>
     <h1>User Management</h1>
     <h2>All Users</h2>
@@ -76,7 +106,7 @@
       </table>
     </div>
     <h2>Create New User</h2>
-    <div id="register-form">
+    <form id="register-form" onsubmit="event.preventDefault(); createNewUser();">
       <label for="reg-username">Username</label>
       <input type="text" id="reg-username" required>
       <label for="reg-password">Password</label>
@@ -94,8 +124,8 @@
         <option value="Principal Engineer">Principal Engineer</option>
         <option value="System Consultant">System Consultant</option>
       </select>
-      <button onclick="createNewUser()">Create User</button>
-    </div>
+      <button type="submit">Create User</button>
+    </form>
   </div>
 
   <div class="card hidden checklist-card" id="checklist-card">
@@ -106,14 +136,10 @@
     <input type="text" id="client-name" required>
     <label for="project-id">Project ID</label>
     <input type="text" id="project-id">
-    
     <label>URN(s) + Trigger Type</label>
-    <div class="urn-list" id="urn-list">
-      </div>
+    <div class="urn-list" id="urn-list"></div>
     <button type="button" onclick="addUrnPair()">Add URN + Trigger Type</button>
-    
     <hr style="margin-top: 30px;">
-
     <h2>Standard Checks</h2>
     <ul id="checklist">
       <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Turn off EWF</span></li>
@@ -133,34 +159,70 @@
       <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">DVLA lookup correctly done on EMC</span></li>
       <li onclick="toggleCheck(this)"><span class="checkbox"></span><span class="item-text">Alerts moved on Hold folder for client UAT</span></li>
     </ul>
-
     <label for="notes-section">Notes</label>
     <textarea id="notes-section" rows="6" placeholder="Add any additional notes here..."></textarea>
     <button onclick="exportPDF()">Export as PDF</button>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script>
-    const backendUrl = "https://vdlchecklist.onrender.com"; // Your live backend URL
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+    // =================================================================
+    //                    Configuration & State
+    // =================================================================
+    const backendUrl = "https://vdlchecklist.onrender.com"; // 🚨 IMPORTANT: Use your live backend URL
     let currentUser = "";
 
-    // --- Navigation ---
+    // =================================================================
+    //                    Page Load Logic
+    // =================================================================
+    window.onload = function() {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+        if (token) {
+            // If a reset token is in the URL, show the reset password form
+            showView('reset-password-card');
+        } else {
+            // Otherwise, show the login page
+            showView('login-card');
+        }
+    };
+
+    // =================================================================
+    //                    Navigation Functions
+    // =================================================================
     function showView(viewId) {
         document.querySelectorAll('.card').forEach(card => card.classList.add('hidden'));
         document.getElementById(viewId).classList.remove('hidden');
     }
 
-    function goToChecklist() { 
+    function goToLogin(event) {
+        event.preventDefault();
+        window.history.pushState({}, '', '/');
+        showView('login-card');
+    }
+
+    function goToChecklist() {
         document.getElementById('checklist-username').innerText = currentUser;
-        showView('checklist-card'); 
+        showView('checklist-card');
     }
 
-    function goBackToLanding() { 
-        showView('landing-card'); 
+    function goBackToLanding() {
+        showView('landing-card');
     }
 
-    // --- User Management ---
+    function goToProfile() {
+        showView('profile-card');
+    }
+    
+    function goToForgotPassword(event) {
+        event.preventDefault();
+        showView('forgot-password-card');
+    }
+    
+    // =================================================================
+    //                  User & Password Management
+    // =================================================================
     async function login() {
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
@@ -196,7 +258,79 @@
         document.getElementById('user-management-btn').classList.add('hidden');
         showView('login-card');
     }
-    
+
+    async function changePassword() {
+        const currentPassword = document.getElementById('current-password').value;
+        const newPassword = document.getElementById('new-password').value;
+        const token = localStorage.getItem('authToken');
+
+        try {
+            const response = await fetch(`${backendUrl}/api/user/change-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ currentPassword, newPassword })
+            });
+
+            const result = await response.json();
+            alert(result.message);
+
+            if (response.ok) {
+                document.getElementById('current-password').value = '';
+                document.getElementById('new-password').value = '';
+                goBackToLanding();
+            }
+        } catch (error) {
+            alert('An error occurred while changing the password.');
+        }
+    }
+
+    async function requestPasswordReset() {
+        const email = document.getElementById('forgot-email').value;
+        try {
+            const response = await fetch(`${backendUrl}/forgot-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const result = await response.json();
+            alert(result.message);
+        } catch (error) {
+            alert('An error occurred.');
+        }
+    }
+
+    async function performPasswordReset() {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+        const newPassword = document.getElementById('reset-new-password').value;
+
+        if (!token || !newPassword) {
+            alert("Invalid link or missing new password.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${backendUrl}/reset-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token, newPassword })
+            });
+            const result = await response.json();
+            alert(result.message);
+            if(response.ok) {
+                window.location.href = window.location.pathname; // Go to login page
+            }
+        } catch (error) {
+            alert('An error occurred.');
+        }
+    }
+
+    // =================================================================
+    //                  Admin Functions
+    // =================================================================
     async function goToUserManagement() {
         showView('user-management-card');
         const token = localStorage.getItem('authToken');
@@ -236,14 +370,12 @@
             email: document.getElementById('reg-email').value,
             job_role: document.getElementById('reg-job-role').value
         };
-
         for(const key in userDetails) {
             if(!userDetails[key]) {
                 alert(`Please fill out the ${key} field.`);
                 return;
             }
         }
-
         const token = localStorage.getItem('authToken');
         try {
             const response = await fetch(`${backendUrl}/register`, {
@@ -264,8 +396,10 @@
             alert("Failed to create user.");
         }
     }
-
-    // --- Checklist Functionality ---
+    
+    // =================================================================
+    //                  Checklist Functions
+    // =================================================================
     function addUrnPair() {
       const urnList = document.getElementById("urn-list");
       const group = document.createElement("div");
@@ -344,6 +478,6 @@
     async function exportPDF() {
       alert("PDF export functionality needs to be reviewed and updated for the full application layout.");
     }
-  </script>
+</script>
 </body>
 </html>
