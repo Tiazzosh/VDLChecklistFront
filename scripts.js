@@ -94,7 +94,7 @@ async function changePassword() {
     const token = localStorage.getItem('authToken');
 
     try {
-        const response = await fetch(`${backendUrl}/api/user/change-password`, {
+        const response = await fetch(`${backendUrl}/user/change-password`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -164,7 +164,7 @@ async function goToUserManagement() {
     showView('user-management-card');
     const token = localStorage.getItem('authToken');
     try {
-        const response = await fetch(`${backendUrl}/api/users`, {
+        const response = await fetch(`${backendUrl}/users`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.status === 403) throw new Error('Access denied.');
