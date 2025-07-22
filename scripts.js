@@ -199,6 +199,7 @@ async function createNewUser() {
         email: document.getElementById('reg-email').value,
         job_role: document.getElementById('reg-job-role').value
     };
+    
     for(const key in userDetails) {
         if(!userDetails[key]) {
             alert(`Please fill out the ${key} field.`);
@@ -207,7 +208,7 @@ async function createNewUser() {
     }
     const token = localStorage.getItem('authToken');
     try {
-        const response = await fetch(`${backendUrl}/register`, {
+        const response = await fetch(`${backendUrl}/api/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -217,13 +218,28 @@ async function createNewUser() {
         });
         const result = await response.json();
         alert(result.message);
+
         if (response.ok) {
             document.getElementById('register-form').reset();
-            goToUserManagement();
+            // Add the new user directly to the table
+            addUserToTable(result.user);
         }
     } catch (error) {
         alert("Failed to create user.");
     }
+}
+
+function addUserToTable(user) {
+    const tableBody = document.getElementById('users-table-body');
+    const row = tableBody.insertRow();
+    row.innerHTML = `
+        <td>${user.id}</td>
+        <td>${user.username}</td>
+        <td>${user.name} ${user.surname}</td>
+        <td>${user.email}</td>
+        <td>${user.job_role}</td>
+        <td>${user.is_admin ? '✔️' : '❌'}</td>
+    `;
 }
 
 // =================================================================
