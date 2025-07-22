@@ -199,7 +199,7 @@ async function createNewUser() {
         email: document.getElementById('reg-email').value,
         job_role: document.getElementById('reg-job-role').value
     };
-    
+
     for(const key in userDetails) {
         if(!userDetails[key]) {
             alert(`Please fill out the ${key} field.`);
@@ -208,7 +208,7 @@ async function createNewUser() {
     }
     const token = localStorage.getItem('authToken');
     try {
-        const response = await fetch(`${backendUrl}/api/register`, {
+        const response = await fetch(`${backendUrl}/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
