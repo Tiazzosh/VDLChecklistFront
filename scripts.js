@@ -1,7 +1,7 @@
 // =================================================================
 //                    Configuration & State
 // =================================================================
-const backendUrl = "https://vdlchecklist-0pfo.onrender.com";
+const backendUrl = "https://vdlchecklist.onrender.com";
 let currentUser = "";
 let currentChecklistId = null;
 
