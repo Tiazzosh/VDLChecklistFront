@@ -37,13 +37,14 @@
   <div class="card hidden" id="landing-card">
     <h1>Welcome, <span id="logged-in-user"></span></h1>
     <p><strong>What do you want to do?</strong></p>
-    <button id="go-to-checklist-btn">Create a checklist</button>
+    <button id="go-to-my-checklists-btn">My Checklists</button>
+    <button id="go-to-checklist-btn">Create a new checklist</button>
     <button id="user-management-btn" class="hidden">User Management</button>
     <button id="go-to-profile-btn">My Profile</button>
     <hr>
     <button id="logout-btn" style="background-color: #6c757d;">Logout</button>
   </div>
-  
+
   <div class="card auth-card hidden" id="profile-card">
     <button class="back-to-landing-btn">← Back to Main Menu</button>
     <h1>My Profile</h1>
@@ -53,6 +54,24 @@
     <label for="new-password">New Password</label>
     <input type="password" id="new-password" required>
     <button id="change-password-btn">Update Password</button>
+  </div>
+
+  <div class="card hidden" id="my-checklists-card">
+    <button class="back-to-landing-btn">← Back to Main Menu</button>
+    <h1>My Checklists</h1>
+    <div style="overflow-x:auto;">
+      <table id="checklists-table">
+        <thead>
+          <tr>
+            <th>Client Name</th>
+            <th>Project ID</th>
+            <th>Last Modified</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="checklists-table-body"></tbody>
+      </table>
+    </div>
   </div>
 
   <div class="card hidden user-management-card" id="user-management-card">
@@ -99,7 +118,7 @@
 
   <div class="card hidden checklist-card" id="checklist-card">
     <button class="back-to-landing-btn">← Back to Main Menu</button>
-    <h1>Videalert Post-Install Checklist</h1>
+    <h1 id="checklist-title">Videalert Post-Install Checklist</h1>
     <p>Logged in as: <strong id="checklist-username"></strong></p>
     <label for="client-name">Client Name *</label>
     <input type="text" id="client-name" required>
@@ -130,7 +149,10 @@
     </ul>
     <label for="notes-section">Notes</label>
     <textarea id="notes-section" rows="6" placeholder="Add any additional notes here..."></textarea>
-    <button id="export-pdf-btn">Export as PDF</button>
+    <div class="checklist-actions">
+        <button id="save-checklist-btn">Save Checklist</button>
+        <button id="export-pdf-btn">Export as PDF</button>
+    </div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
