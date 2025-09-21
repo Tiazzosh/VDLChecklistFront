@@ -360,7 +360,11 @@ async function editChecklist(checklistId) {
         document.getElementById('project-id').value = checklist.project_id;
         document.getElementById('notes-section').value = checklist.notes;
 
-        const checklistItems = JSON.parse(checklist.checklist_items);
+        // FIX HERE: Safely parse the JSON data from the database
+        const checklistItems = typeof checklist.checklist_items === 'string' 
+            ? JSON.parse(checklist.checklist_items) 
+            : checklist.checklist_items;
+
         document.querySelectorAll('#checklist li').forEach(item => {
             const text = item.querySelector('.item-text').innerText;
             const savedItem = checklistItems.find(i => i.text === text);
